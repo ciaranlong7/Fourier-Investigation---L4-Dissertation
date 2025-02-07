@@ -39,7 +39,7 @@ plt.figure(figsize=(12, 5))
 
 # Frequency-domain plot (|E(z,ω)|)
 plt.subplot(1, 2, 1)
-plt.plot(np.abs(frequencies), np.abs(harmonic_spectrum_values))
+plt.plot(modulus(frequencies), modulus(harmonic_spectrum_values))
 plt.xlabel("Frequency ω / arb. units")
 plt.ylabel("|E(z,ω)| / arb. units")
 plt.title("Harmonic Spectrum in Frequency Domain (Odd Harmonics)")
@@ -109,17 +109,21 @@ E_z_t0 = gauss(z_points, E_0, a, b)
 # height = 5
 # E_z_t0 = rect(z_points, rect_min, rect_max, height)
 
-#Electric field after time t
-t = 5
-E_z_t = electric_field_zt(E_z_t0, t, dz)
-
 
 #Plot of E field at time t'=0 and t'=t:
 plt.figure(figsize=(12, 5))
-plt.plot(z_points, E_z_t0, label="E(z, t=0)")
+#Electric field after time t
+t = 4
+E_z_t = electric_field_zt(E_z_t0, t, dz)
+plt.plot(z_points, E_z_t0, color="#1f77b4",label="E(z, t=0)")
 plt.fill(z_points, E_z_t0, color="#1f77b4", alpha=0.3)
-plt.plot(z_points, E_z_t, label=f"E(z, t={t})")
+plt.plot(z_points, E_z_t, color="#ff7f0e",label=f"E(z, t={t})")
 plt.fill(z_points, E_z_t, color="#ff7f0e", alpha=0.3)
+t = 8
+E_z_t = electric_field_zt(E_z_t0, t, dz)
+plt.plot(z_points, E_z_t, color="#2ca02c", label=f"E(z, t={t})")
+plt.fill(z_points, E_z_t, color="#2ca02c", alpha=0.3)
+plt.xlim(-3,12)
 plt.xlabel("Z / arb. units")
 plt.ylabel("|E(z,t)| / arb. units")
 plt.title("Electric Field Evolution - Hedgehog-In-Time Equation Solved")
