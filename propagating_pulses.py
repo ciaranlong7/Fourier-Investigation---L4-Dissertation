@@ -4,6 +4,9 @@ from matplotlib.widgets import Slider
 from matplotlib.collections import PolyCollection
 import scipy.fft as fft
 
+def modulus(input):
+    return np.sqrt(np.real(input)**2+ np.imag(input)**2)
+
 ##Investigation 1 - The relationship between harmonics in freq domain and attosecond pulses in the time domain:
 # Define parameters
 t_min, t_max = -20, 20   # Time range (arbitrary units)
@@ -23,10 +26,10 @@ def harmonic_spectrum(frequencies, base_freq=10, max_order=15):
 
 # Compute the frequency domain representation (harmonic spectrum)
 frequencies = fft.fftfreq(num_t, d=dt) * 2 * np.pi  # Frequency array (ω)
-harmonic_spectrum_values = harmonic_spectrum(np.abs(frequencies), base_freq=10, max_order=15)
+harmonic_spectrum_values = harmonic_spectrum(modulus(frequencies), base_freq=10, max_order=15)
 
-# Compute the attosecond pulse train by taking the inverse Fourier transform
-E_t_values = np.abs(fft.ifft(fft.ifftshift(harmonic_spectrum_values)))  # Ensure real-valued time-domain signal
+# Compute the attosecond pulse train by taking the Fourier transform
+E_t_values = modulus(fft.fft(fft.fftshift(harmonic_spectrum_values)))
 
 # Convert time array to wave periods (relative to the base frequency)
 wave_periods = (t - t_min) / (2 * np.pi / 10)  # Base frequency period is 2π/10
@@ -37,16 +40,16 @@ plt.figure(figsize=(12, 5))
 # Frequency-domain plot (|E(z,ω)|)
 plt.subplot(1, 2, 1)
 plt.plot(np.abs(frequencies), np.abs(harmonic_spectrum_values))
-plt.xlabel("Frequency ω")
-plt.ylabel("|E(z,ω)|")
+plt.xlabel("Frequency ω / arb. units")
+plt.ylabel("|E(z,ω)| / arb. units")
 plt.title("Harmonic Spectrum in Frequency Domain (Odd Harmonics)")
 plt.xlim(0, 160)
 
 # Time-domain plot (attosecond pulse train in wave periods)
 plt.subplot(1, 2, 2)
 plt.plot(wave_periods, E_t_values)
-plt.xlabel("Time (wave periods)")
-plt.ylabel("|E(z,t)|")
+plt.xlabel("Time / wave periods")
+plt.ylabel("|E(z,t)| / arb. units")
 plt.title("Train of Attosecond Pulses in Time Domain")
 plt.xlim(0, 10)  # Restrict to the first 10 wave periods
 
@@ -85,7 +88,7 @@ def electric_field_zt(E_z_t0, t, dz):
     # Inverse Fourier transform to get E(z, t) - final step of hedgehog in time equation.
     E_z_t = fft.ifft(E_k_t)
 
-    modulus_E_z_t = np.sqrt(np.real(E_z_t)**2+ np.imag(E_z_t)**2)
+    modulus_E_z_t = modulus(E_z_t)
 
     return modulus_E_z_t
 
@@ -95,16 +98,16 @@ z_max = 20
 z_points = np.arange(z_min, z_max, dz)  # min,max of z-axis for the plot
 
 #Gauss function
-# E_0 = 1
-# b = 0
-# a = 1
-# E_z_t0 = gauss(z_points, E_0, a, b)
+E_0 = 1
+b = 0
+a = 1
+E_z_t0 = gauss(z_points, E_0, a, b)
 
 #Rect function
-rect_min = 0
-rect_max = 1
-height = 5
-E_z_t0 = rect(z_points, rect_min, rect_max, height)
+# rect_min = 0
+# rect_max = 1
+# height = 5
+# E_z_t0 = rect(z_points, rect_min, rect_max, height)
 
 #Electric field after time t
 t = 5
@@ -117,44 +120,14 @@ plt.plot(z_points, E_z_t0, label="E(z, t=0)")
 plt.fill(z_points, E_z_t0, color="#1f77b4", alpha=0.3)
 plt.plot(z_points, E_z_t, label=f"E(z, t={t})")
 plt.fill(z_points, E_z_t, color="#ff7f0e", alpha=0.3)
-plt.xlabel("Z")
-plt.ylabel("Electric Field Amplitude (modulus E)")
-plt.title("Electric Field Evolution")
+plt.xlabel("Z / arb. units")
+plt.ylabel("|E(z,t)| / arb. units")
+plt.title("Electric Field Evolution - Hedgehog-In-Time Equation Solved")
 plt.legend()
 plt.show()
 
 
-# #Comibing mupltiple plots to the same axes
-# fig, axes = plt.subplots(3, 1, figsize=(12, 7), sharex=True)  # 3 rows, 1 column
-
-# axes[0].plot(z_points, E_z_t0, label="E(z, t=0)")
-# axes[0].fill(z_points, E_z_t0, color="#1f77b4", alpha=0.3)
-# axes[0].plot(z_points, E_z_t, label=f"E(z, t={t})")
-# axes[0].fill(z_points, E_z_t, color="#ff7f0e", alpha=0.3)
-# axes[0].set_ylabel('Frequency')
-# axes[0].legend(loc='upper right')
-# axes[0].set_title(f'Redshift Distribution - CLAGN & Non-CL AGN Samples 1/2/3')
-
-# axes[1].plot(z_points, E_z_t0, label="E(z, t=0)")
-# axes[1].fill(z_points, E_z_t0, color="#1f77b4", alpha=0.3)
-# axes[1].plot(z_points, E_z_t, label=f"E(z, t={t})")
-# axes[1].fill(z_points, E_z_t, color="#ff7f0e", alpha=0.3)
-# axes[1].set_ylabel('Frequency')
-# axes[1].legend(loc='upper right')
-
-# axes[2].plot(z_points, E_z_t0, label="E(z, t=0)")
-# axes[2].fill(z_points, E_z_t0, color="#1f77b4", alpha=0.3)
-# axes[2].plot(z_points, E_z_t, label=f"E(z, t={t})")
-# axes[2].fill(z_points, E_z_t, color="#ff7f0e", alpha=0.3)
-# axes[2].set_xlabel('Frequency')
-# axes[2].set_ylabel('Frequency')
-# axes[2].legend(loc='upper right')
-
-# plt.tight_layout()
-# plt.show()
-
-
-# #Making a plot that can be updated:
+# A plot that can be updated in real time:
 # fig, ax = plt.subplots()
 # plt.subplots_adjust(bottom=0.25) #making space for slider
 
