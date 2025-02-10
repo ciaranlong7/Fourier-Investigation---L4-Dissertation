@@ -101,33 +101,33 @@ plt.show()
 
 
 # A plot that can be updated in real time:
-# fig, ax = plt.subplots()
-# plt.subplots_adjust(bottom=0.25) #making space for slider
+fig, ax = plt.subplots()
+plt.subplots_adjust(bottom=0.25) #making space for slider
 
-# ax_slider = plt.axes([0.2, 0.1, 0.65, 0.03], facecolor="lightgray")
-# slider = Slider(ax_slider, "Time (t)", valmin=0, valmax=10, valinit=t, valstep=0.01)
+ax_slider = plt.axes([0.2, 0.1, 0.65, 0.03], facecolor="lightgray")
+slider = Slider(ax_slider, "Time (t)", valmin=0, valmax=15, valinit=t, valstep=0.01)
 
-# ax.plot(x_points, E_x_t0, label="E(x, t=0)")
-# ax.fill_between(x_points, E_x_t0, color="#1f77b4", alpha=0.3)
-# line, = ax.plot(x_points, E_x_t, color="#ff7f0e", label=f"E(x, t={t})")
-# fill = ax.fill_between(x_points, E_x_t, color="#ff7f0e", alpha=0.3)
-# ax.set_xlabel("x")
-# ax.set_ylabel("Electric Field")
-# ax.set_title("Electric Field Evolution")
-# ax.legend()
+ax.plot(x_points, E_x_t0, label="E(x, t=0)")
+ax.fill_between(x_points, E_x_t0, color="#1f77b4", alpha=0.3)
+line, = ax.plot(x_points, E_x_t, color="#ff7f0e", label=f"E(x, t={t})")
+fill = ax.fill_between(x_points, E_x_t, color="#ff7f0e", alpha=0.3)
+ax.set_xlabel("X / arb. units")
+ax.set_ylabel("|E(x,t)| / arb. units")
+ax.set_title("Electric Field Evolution - Hedgehog-In-Time Equation Solved")
+ax.legend()
 
-# def update(val):
-#     t = slider.val
-#     E_x_t = electric_field_xt(E_x_t0, t, dx)
-#     line.set_ydata(E_x_t)
-#     for collection in [c for c in ax.collections if isinstance(c, PolyCollection)]:
-#         collection.remove()
-#     ax.fill_between(x_points, E_x_t0, color="#1f77b4", alpha=0.3)
-#     ax.fill_between(x_points, E_x_t, color="#ff7f0e", alpha=0.3)
-#     line.set_label(f"E(x, t={t:.2f})")
-#     ax.legend()
-#     fig.canvas.draw_idle()
+def update(val):
+    t = slider.val
+    E_x_t = electric_field_xt_dispersion(E_x_t0, t, dx, omega_function)
+    line.set_ydata(E_x_t)
+    for collection in [c for c in ax.collections if isinstance(c, PolyCollection)]:
+        collection.remove()
+    ax.fill_between(x_points, E_x_t0, color="#1f77b4", alpha=0.3)
+    ax.fill_between(x_points, E_x_t, color="#ff7f0e", alpha=0.3)
+    line.set_label(f"E(x, t={t:.2f})")
+    ax.legend()
+    fig.canvas.draw_idle()
 
-# slider.on_changed(update)
+slider.on_changed(update)
 
-# plt.show()
+plt.show()
