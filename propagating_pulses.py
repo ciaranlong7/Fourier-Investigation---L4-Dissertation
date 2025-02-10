@@ -17,6 +17,18 @@ def rect(x_points, min, max, height):
     E_x_t0 = np.where(np.logical_and(x_points >= min, x_points <= max), height, 0)
     return E_x_t0
 
+def triangle(x_points, centre, width, height):
+    min_val = centre - width / 2
+    max_val = centre + width / 2
+    slope = height / (width / 2)
+    E_x_t0 = np.zeros_like(x_points)
+    for i, x in enumerate(x_points):
+        if min_val <= x < centre:
+            E_x_t0[i] = slope * (x - min_val)
+        elif centre <= x <= max_val:
+            E_x_t0[i] = height - slope * (x - centre)
+    return E_x_t0
+
 c = 1  # Speed of light in medium. Arbitrary units
 
 #Solving hedgehog-in-time equation:
@@ -78,6 +90,12 @@ E_x_t0 = gauss(x_points, E_0, a, b)
 # height = 5
 # E_x_t0 = rect(x_points, rect_min, rect_max, height)
 
+#Triangle function
+centre = 0
+width = 1
+height = 1
+E_x_t0 = triangle(x_points, centre, width, height)
+
 
 #Plot of E field at time t'=0 and t'=t:
 #Electric field after time t
@@ -92,10 +110,10 @@ t = 8
 E_x_t = electric_field_xt_dispersion(E_x_t0, t, dx, omega_function)
 plt.plot(x_points, E_x_t, color="#2ca02c", label=f"E(x,t={t})")
 plt.fill(x_points, E_x_t, color="#2ca02c", alpha=0.3)
-# plt.xlim(-3,12)
+plt.xlim(-3,12)
 plt.xlabel("X / arb. units")
 plt.ylabel("|E(x,t)| / arb. units")
-plt.title("Electric Field Evolution - Hedgehog-In-Time Equation Solved")
+plt.title("Light Pulse Evolution - Hedgehog-In-Time Equation Solved")
 plt.legend()
 plt.show()
 
@@ -113,7 +131,7 @@ line, = ax.plot(x_points, E_x_t, color="#ff7f0e", label=f"E(x, t={t})")
 fill = ax.fill_between(x_points, E_x_t, color="#ff7f0e", alpha=0.3)
 ax.set_xlabel("X / arb. units")
 ax.set_ylabel("|E(x,t)| / arb. units")
-ax.set_title("Electric Field Evolution - Hedgehog-In-Time Equation Solved")
+ax.set_title("Light Pulse Evolution - Hedgehog-In-Time Equation Solved")
 ax.legend()
 
 def update(val):
